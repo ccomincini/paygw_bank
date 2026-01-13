@@ -1,5 +1,5 @@
 <?php
-// This file is part of the bank paymnts module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,52 +15,76 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains helper class to work with PayPal REST API.
+ * Contains helper class for bank payment gateway.
  *
- * @package   paygw_bank
- * @copyright UNESCO/IESALC
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace paygw_bank;
 
-use curl;
 use core_user;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once $CFG->libdir . '/filelib.php';
-
 use core_payment\helper as payment_helper;
 use stdClass;
 
-class bank_helper
-{
+/**
+ * Helper class for bank payment gateway operations.
+ *
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class bank_helper {
 
-
-    public static function get_openbankentry($itemid, $userid): \stdClass
-    {
+    /**
+     * Get an open bank entry for a user and item.
+     *
+     * @param int $itemid The item ID
+     * @param int $userid The user ID
+     * @return stdClass The bank entry record
+     */
+    public static function get_openbankentry($itemid, $userid): stdClass {
         global $DB;
         $record = $DB->get_record('paygw_bank', ['itemid' => $itemid, 'userid' => $userid, 'status' => 'P']);
         return $record;
     }
-    public static function check_hasfiles($id): \stdClass
-    {
+
+    /**
+     * Check and update hasfiles flag for a bank entry.
+     *
+     * @param int $id The bank entry ID
+     * @return stdClass|null The updated record or null
+     */
+    public static function check_hasfiles($id): ?stdClass {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
         $record = $DB->get_record('paygw_bank', ['id' => $id]);
         if ($record->userid == $USER->id) {
             $record->hasfiles = 1;
             $DB->update_record('paygw_bank', $record);
+            $transaction->allow_commit();
             return $record;
         }
         return null;
     }
-    public static function aprobe_pay($id): \stdClass
-    {
+
+    /**
+     * Approve a payment.
+     *
+     * @param int $id The bank entry ID
+     * @return stdClass The updated record
+     */
+    public static function aprobe_pay($id): stdClass {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
         $record = $DB->get_record('paygw_bank', ['id' => $id]);
-        $config = (object) payment_helper::get_gateway_configuration($record->component, $record->paymentarea, $record->itemid, 'bank');
+        $config = (object) payment_helper::get_gateway_configuration(
+            $record->component,
+            $record->paymentarea,
+            $record->itemid,
+            'bank'
+        );
         $payable = payment_helper::get_payable($record->component, $record->paymentarea, $record->itemid);
         $paymentid = payment_helper::save_payment(
             $payable->get_account_id(),
@@ -78,28 +102,30 @@ class bank_helper
         $record->paymentid = $paymentid;
         $DB->update_record('paygw_bank', $record);
         payment_helper::deliver_order($record->component, $record->paymentarea, $record->itemid, $paymentid, (int) $record->userid);
-        $send_email = get_config('paygw_bank', 'sendconfmail');
-        if ($send_email) {
+
+        $sendemail = get_config('paygw_bank', 'sendconfmail');
+        if ($sendemail) {
             $supportuser = core_user::get_support_user();
-            $paymentuser=bank_helper::get_user($record->userid);
+            $paymentuser = self::get_user($record->userid);
             $fullname = fullname($paymentuser, true);
-            $userlang=$USER->lang;
-            $USER->lang=$paymentuser->lang;
+            $userlang = $USER->lang;
+            $USER->lang = $paymentuser->lang;
             $subject = get_string('mail_confirm_pay_subject', 'paygw_bank');
-            $contentmessage = new stdClass;
+            $contentmessage = new stdClass();
             $contentmessage->username = $fullname;
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
             $mailcontent = get_string('mail_confirm_pay', 'paygw_bank', $contentmessage);
             email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
-            $USER->lang=$userlang;
+            $USER->lang = $userlang;
         }
-        $send_email = get_config('paygw_bank', 'senconfirmailtosupport');
-        $emailaddress=get_config('paygw_bank', 'notificationsaddress');
-        if ($send_email) {
+
+        $sendemail = get_config('paygw_bank', 'senconfirmailtosupport');
+        $emailaddress = get_config('paygw_bank', 'notificationsaddress');
+        if ($sendemail) {
             $supportuser = core_user::get_support_user();
             $subject = get_string('email_notifications_subject_confirm', 'paygw_bank');
-             $contentmessage = new stdClass;
+            $contentmessage = new stdClass();
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
             $mailcontent = get_string('email_notifications_confirm', 'paygw_bank', $contentmessage);
@@ -112,83 +138,152 @@ class bank_helper
 
         return $record;
     }
-    public static function files($id): array
-    {
+
+    /**
+     * Get files for a bank entry.
+     *
+     * @param int $id The bank entry ID
+     * @return array The files
+     */
+    public static function files($id): array {
         $fs = get_file_storage();
         $files = $fs->get_area_files(\context_system::instance()->id, 'paygw_bank', 'transfer', $id);
-        $realfiles=array();
+        $realfiles = [];
         foreach ($files as $f) {
-            if($f->get_filename()!='.') {
-                array_push($realfiles, $f);
+            if ($f->get_filename() != '.') {
+                $realfiles[] = $f;
             }
         }
         return $realfiles;
     }
-    public static function get_user($userid)
-    {
+
+    /**
+     * Get a user by ID.
+     *
+     * @param int $userid The user ID
+     * @return stdClass The user record
+     */
+    public static function get_user($userid) {
         global $DB;
         return $DB->get_record('user', ['id' => $userid]);
     }
-    public static function deny_pay($id): \stdClass
-    {
+
+    /**
+     * Deny a payment.
+     *
+     * @param int $id The bank entry ID
+     * @return stdClass The updated record
+     */
+    public static function deny_pay($id): stdClass {
         global $DB, $USER;
-        $transaction = $DB->start_delegated_transaction();;
+        $transaction = $DB->start_delegated_transaction();
         $record = $DB->get_record('paygw_bank', ['id' => $id]);
-        $config = (object) payment_helper::get_gateway_configuration($record->component, $record->paymentarea, $record->itemid, 'bank');
+        $config = (object) payment_helper::get_gateway_configuration(
+            $record->component,
+            $record->paymentarea,
+            $record->itemid,
+            'bank'
+        );
         $payable = payment_helper::get_payable($record->component, $record->paymentarea, $record->itemid);
-        $paymentuser=bank_helper::get_user($record->userid);
+        $paymentuser = self::get_user($record->userid);
         $record->timechecked = time();
         $record->status = 'D';
         $record->usercheck = $USER->id;
         $DB->update_record('paygw_bank', $record);
-        $send_email = get_config('paygw_bank', 'senddenmail');
-        if ($send_email) {
+
+        $sendemail = get_config('paygw_bank', 'senddenmail');
+        if ($sendemail) {
             $supportuser = core_user::get_support_user();
             $fullname = fullname($paymentuser, true);
-            $userlang=$USER->lang;
-            $USER->lang=$paymentuser->lang;
-          
+            $userlang = $USER->lang;
+            $USER->lang = $paymentuser->lang;
             $subject = get_string('mail_denied_pay_subject', 'paygw_bank');
-            $contentmessage = new stdClass;
+            $contentmessage = new stdClass();
             $contentmessage->username = $fullname;
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
             $mailcontent = get_string('mail_denied_pay', 'paygw_bank', $contentmessage);
             email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
-            $USER->lang=$userlang;
+            $USER->lang = $userlang;
         }
         $transaction->allow_commit();
         return $record;
     }
 
-    public static function get_pending(): array
-    {
+    /**
+     * Send a denied notification.
+     *
+     * @param stdClass $request The payment request
+     */
+    public static function send_denied_notification($request): void {
+        $sendemail = get_config('paygw_bank', 'senddenmail');
+        if ($sendemail) {
+            $supportuser = core_user::get_support_user();
+            $paymentuser = self::get_user($request->userid);
+            $fullname = fullname($paymentuser, true);
+            $subject = get_string('mail_denied_pay_subject', 'paygw_bank');
+            $contentmessage = new stdClass();
+            $contentmessage->username = $fullname;
+            $contentmessage->code = $request->code;
+            $contentmessage->concept = $request->description;
+            $mailcontent = get_string('mail_denied_pay', 'paygw_bank', $contentmessage);
+            email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
+        }
+    }
+
+    /**
+     * Get all pending payments.
+     *
+     * @return array The pending payments
+     */
+    public static function get_pending(): array {
         global $DB;
         $records = $DB->get_records('paygw_bank', ['status' => 'P']);
         return $records;
     }
-    public static function get_user_pending($userid): array
-    {
+
+    /**
+     * Get pending payments for a user.
+     *
+     * @param int $userid The user ID
+     * @return array The pending payments
+     */
+    public static function get_user_pending($userid): array {
         global $DB;
         $records = $DB->get_records('paygw_bank', ['status' => 'P', 'userid' => $userid]);
         return $records;
     }
-    public static function has_openbankentry($itemid, $userid): bool
-    {
+
+    /**
+     * Check if a user has an open bank entry for an item.
+     *
+     * @param int $itemid The item ID
+     * @param int $userid The user ID
+     * @return bool True if an open entry exists
+     */
+    public static function has_openbankentry($itemid, $userid): bool {
         global $DB;
-        if ($DB->count_records('paygw_bank', ['itemid' => $itemid, 'userid' => $userid, 'status' => 'P']) > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return $DB->count_records('paygw_bank', ['itemid' => $itemid, 'userid' => $userid, 'status' => 'P']) > 0;
     }
-    public static function create_bankentry($itemid, $userid, $totalamount, $currency, $component, $paymentarea, $description): \stdClass
-    {
+
+    /**
+     * Create a new bank entry.
+     *
+     * @param int $itemid The item ID
+     * @param int $userid The user ID
+     * @param float $totalamount The total amount
+     * @param string $currency The currency
+     * @param string $component The component
+     * @param string $paymentarea The payment area
+     * @param string $description The description
+     * @return stdClass|null The created record or null if already exists
+     */
+    public static function create_bankentry($itemid, $userid, $totalamount, $currency, $component, $paymentarea, $description): ?stdClass {
         global $DB;
-        if (bank_helper::has_openbankentry($itemid, $userid)) {
+        if (self::has_openbankentry($itemid, $userid)) {
             return null;
         }
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->itemid = $itemid;
         $record->component = $component;
         $record->paymentarea = $paymentarea;
@@ -196,22 +291,23 @@ class bank_helper
         $record->userid = $userid;
         $record->totalamount = $totalamount;
         $record->currency = $currency;
-        $record->code = $record->timemodified = time();
+        $record->code = time();
         $record->usercheck = 0;
         $record->status = 'P';
-        $record->timecreated = $record->timemodified = time();
+        $record->timecreated = time();
 
         $id = $DB->insert_record('paygw_bank', $record);
         $record->id = $id;
-        $record->code = bank_helper::create_code($id);
+        $record->code = self::create_code($id);
         $DB->update_record('paygw_bank', $record);
-        $send_email = get_config('paygw_bank', 'sendnewrequestmail');
-        $emailaddress=get_config('paygw_bank', 'notificationsaddress');
 
-        if ($send_email) {
+        $sendemail = get_config('paygw_bank', 'sendnewrequestmail');
+        $emailaddress = get_config('paygw_bank', 'notificationsaddress');
+
+        if ($sendemail) {
             $supportuser = core_user::get_support_user();
             $subject = get_string('email_notifications_subject_new', 'paygw_bank');
-            $contentmessage = new stdClass;
+            $contentmessage = new stdClass();
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
             $mailcontent = get_string('email_notifications_new_request', 'paygw_bank', $contentmessage);
@@ -222,8 +318,14 @@ class bank_helper
         }
         return $record;
     }
-    public static function create_code($id): string
-    {
+
+    /**
+     * Create a code for a bank entry.
+     *
+     * @param int $id The bank entry ID
+     * @return string The code
+     */
+    public static function create_code($id): string {
         return "code_" . $id;
     }
 }

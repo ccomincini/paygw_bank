@@ -1,5 +1,5 @@
 <?php
-// This file is part of the bank paymnts module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,60 +15,60 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This class contains a list of webservice functions related to the bank payment gateway.
+ * External functions for the bank payment gateway.
  *
- * @package   paygw_bank
- * @copyright UNESCO/IESALC
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 declare(strict_types=1);
 
 namespace paygw_bank\external;
+
 use core_payment\helper;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once $CFG->libdir . '/externallib.php';
-
-class get_config_for_js extends external_api
-{
+/**
+ * External class for getting bank gateway configuration for JavaScript.
+ *
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class get_config_for_js extends external_api {
 
     /**
      * Returns description of method parameters.
      *
      * @return external_function_parameters
      */
-    public static function execute_parameters(): external_function_parameters
-    {
-        return new external_function_parameters(
-            [
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
             'component' => new external_value(PARAM_COMPONENT, 'Component'),
             'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'An identifier for payment area in the component'),
-            ]
-        );
+        ]);
     }
 
     /**
      * Returns the config values required by the bank JavaScript SDK.
      *
-     * @param  string $component
-     * @param  string $paymentarea
-     * @param  int    $itemid
-     * @return string[]
+     * @param string $component The component
+     * @param string $paymentarea The payment area
+     * @param int $itemid The item ID
+     * @return array The configuration values
      */
-    public static function execute(string $component, string $paymentarea, int $itemid): array
-    {
+    public static function execute(string $component, string $paymentarea, int $itemid): array {
         self::validate_parameters(
-            self::execute_parameters(), [
-            'component' => $component,
-            'paymentarea' => $paymentarea,
-            'itemid' => $itemid,
+            self::execute_parameters(),
+            [
+                'component' => $component,
+                'paymentarea' => $paymentarea,
+                'itemid' => $itemid,
             ]
         );
 
@@ -89,15 +89,12 @@ class get_config_for_js extends external_api
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure
-    {
-        return new external_single_structure(
-            [
-            'clientid' => new external_value(PARAM_TEXT, 'bank client ID'),
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'clientid' => new external_value(PARAM_TEXT, 'Bank client ID'),
             'brandname' => new external_value(PARAM_TEXT, 'Brand name'),
             'cost' => new external_value(PARAM_FLOAT, 'Cost with gateway surcharge'),
             'currency' => new external_value(PARAM_TEXT, 'Currency'),
-            ]
-        );
+        ]);
     }
 }

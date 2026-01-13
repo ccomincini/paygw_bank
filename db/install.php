@@ -1,5 +1,5 @@
 <?php
-// This file is part of the bank paymnts module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,16 +13,21 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * paygw_bank installer script.
  *
- * @package   paygw_bank
- * @copyright UNESCO/IESALC
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_paygw_bank_install()
-{
+/**
+ * Install the paygw_bank plugin.
+ *
+ * @return void
+ */
+function xmldb_paygw_bank_install() {
     global $CFG;
 
     // Enable the bank payment gateway on installation. It still needs to be configured and enabled for accounts.

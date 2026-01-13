@@ -1,5 +1,5 @@
 <?php
-// This file is part of the bank paymnts module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,36 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains form to apply for PAYNL services through Sebsoft
+ * Payment form for bank transfer gateway.
  *
- * File         edit.php
- * Encoding     UTF-8
- *
- * @package paygw_bank
- *
- * @copyright UNESCO/IESALC
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace paygw_bank;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->libdir . '/formslib.php';
+require_once($CFG->libdir . '/formslib.php');
 
-
-class pay_form extends \moodleform
-{
+/**
+ * Payment form class for bank transfer gateway.
+ *
+ * @package    paygw_bank
+ * @copyright  2022 UNESCO IESALC https://iesalc.unesco.org/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class pay_form extends \moodleform {
 
     /**
-     * form definition
+     * Form definition.
      */
-    public function definition()
-    {
+    public function definition() {
         $mform = $this->_form;
         $mform->setDisableShortforms(true);
+
         $mform->addElement('hidden', 'confirm');
         $mform->setDefault('confirm', 1);
         $mform->setType('confirm', PARAM_INT);
+
         $mform->addElement('hidden', 'component');
         $mform->setType('component', PARAM_TEXT);
 
@@ -59,9 +62,15 @@ class pay_form extends \moodleform
 
         $mform->addElement('submit', 'submitbutton', get_string('start_process', 'paygw_bank'));
     }
-    public function validation($data, $files)
-    {
-        global $DB;
+
+    /**
+     * Validate the form data.
+     *
+     * @param array $data The form data
+     * @param array $files The uploaded files
+     * @return array The validation errors
+     */
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         return $errors;
     }
