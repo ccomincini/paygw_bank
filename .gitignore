@@ -1,0 +1,17 @@
+# Moodle
+.DS_Store
+*.swp
+*.bak
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Node
+node_modules/
+amd/build/
+
+# Backup
+*_backup*/
