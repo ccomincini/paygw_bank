@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Scheduled task for auto-denying expired payment requests.
+ *
+ * @package    paygw_bank
+ * @copyright  2025 Invisiblefarm s.r.l. - Carlo Comincini
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace paygw_bank\task;
 
 use core\task\scheduled_task;
@@ -23,11 +31,10 @@ use core_payment\helper;
  * Scheduled task to auto-deny expired payment requests.
  *
  * @package    paygw_bank
- * @copyright  2025 Luca Bösch <luca.boesch@bfh.ch>
+ * @copyright  2025 Invisiblefarm s.r.l. - Carlo Comincini
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class autodeny_task extends scheduled_task {
-
     /**
      * Return the task's name.
      *

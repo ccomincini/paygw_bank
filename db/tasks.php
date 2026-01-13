@@ -18,7 +18,7 @@
  * Scheduled tasks for paygw_bank.
  *
  * @package    paygw_bank
- * @copyright  2025 Luca Bösch <luca.boesch@bfh.ch>
+ * @copyright  2025 Invisiblefarm s.r.l. - Carlo Comincini
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

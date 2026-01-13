@@ -36,7 +36,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class bank_helper {
-
     /**
      * Get an open bank entry for a user and item.
      *
@@ -278,7 +277,15 @@ class bank_helper {
      * @param string $description The description
      * @return stdClass|null The created record or null if already exists
      */
-    public static function create_bankentry($itemid, $userid, $totalamount, $currency, $component, $paymentarea, $description): ?stdClass {
+    public static function create_bankentry(
+        $itemid,
+        $userid,
+        $totalamount,
+        $currency,
+        $component,
+        $paymentarea,
+        $description
+    ): ?stdClass {
         global $DB;
         if (self::has_openbankentry($itemid, $userid)) {
             return null;
