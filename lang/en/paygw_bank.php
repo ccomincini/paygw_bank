@@ -32,6 +32,7 @@ $string['autodeny'] = 'Auto-deny after';
 $string['autodeny_help'] = 'Automatically deny payment requests that have not been confirmed after this time period. Set to 0 to disable.';
 $string['bank:managepayments'] = 'Manage bank transfer payments';
 $string['cancel_process'] = 'Cancel process';
+$string['close'] = 'Close';
 $string['code'] = 'Code';
 $string['concept'] = 'Concept';
 $string['cost'] = 'Cost';

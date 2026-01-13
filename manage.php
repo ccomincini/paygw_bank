@@ -126,7 +126,7 @@ if (!$bankentries) {
                 . '<div class="modal-content">'
                 . '<div class="modal-header">'
                 . '<h5 class="modal-title" id="staticBackdropLabel' . $bankentry->id . '">' . get_string('files') . '</h5>'
-                . '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' . get_string('close') . '"></button>'
+                . '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' . get_string('close', 'paygw_bank') . '"></button>'
                 . '</div>'
                 . '<div class="modal-body">';
 
@@ -151,7 +151,7 @@ if (!$bankentries) {
             $hasfiles .= '</div>'
                 . '<div class="modal-footer">'
                 . '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'
-                . get_string('close') . '</button>'
+                . get_string('close', 'paygw_bank') . '</button>'
                 . '</div>'
                 . '</div>'
                 . '</div>'

@@ -32,6 +32,7 @@ $string['autodeny'] = 'Rifiuto automatico dopo';
 $string['autodeny_help'] = 'Rifiuta automaticamente le richieste di pagamento non confermate dopo questo periodo di tempo. Imposta a 0 per disabilitare.';
 $string['bank:managepayments'] = 'Gestisci pagamenti tramite bonifico';
 $string['cancel_process'] = 'Annulla processo';
+$string['close'] = 'Chiudi';
 $string['code'] = 'Codice';
 $string['concept'] = 'Causale';
 $string['cost'] = 'Costo';
