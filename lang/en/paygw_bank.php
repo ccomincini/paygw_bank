@@ -38,12 +38,25 @@ $string['concept'] = 'Concept';
 $string['cost'] = 'Cost';
 $string['deny'] = 'Deny';
 $string['email_notifications'] = 'Email notifications';
-$string['email_notifications_confirm'] = 'The bank payment entry with code {$a->code} has been approved';
+$string['email_notifications_confirm'] = 'A payment has been approved.
+
+Code: {$a->code}
+User: {$a->userfullname}
+Email: {$a->useremail}
+Item: {$a->concept}
+Amount: {$a->amount} {$a->currency}
+Date: {$a->date}';
 $string['email_notifications_help'] = 'An external email address can be notified when a new payment is queued or when status changes';
 $string['email_notifications_new_attachments'] = 'The bank payment entry with code {$a->code} has new attachments';
-$string['email_notifications_new_request'] = 'There is a new bank payment request. Code: {$a->code}';
+$string['email_notifications_new_request'] = 'A new bank payment request has been received.
+
+Code: {$a->code}
+User: {$a->userfullname}
+Email: {$a->useremail}
+Item: {$a->concept}
+Amount: {$a->amount} {$a->currency}';
 $string['email_notifications_subject_attachments'] = 'A payment entry has new attachments';
-$string['email_notifications_subject_confirm'] = 'A payment entry has been approved';
+$string['email_notifications_subject_confirm'] = 'Payment approved - {$a->code}';
 $string['email_notifications_subject_new'] = 'New bank payment entry';
 $string['email_to_notify'] = 'Email address for notifications';
 $string['file_already_uploaded'] = 'File already uploaded';
@@ -53,10 +66,33 @@ $string['gatewayname'] = 'Bank transfer';
 $string['hasfiles'] = 'Has files';
 $string['instructionstext'] = 'Instructions shown before accepting transfer payment';
 $string['internalerror'] = 'An internal error has occurred. Please contact us.';
-$string['mail_confirm_pay'] = 'Dear {$a->username}. Your payment for "{$a->concept}" has been confirmed. Code: {$a->code}';
-$string['mail_confirm_pay_subject'] = 'Payment confirmed';
-$string['mail_denied_pay'] = 'Dear {$a->username}. Your payment for "{$a->concept}" has been denied. Code: {$a->code}';
-$string['mail_denied_pay_subject'] = 'Payment denied';
+$string['mail_confirm_pay'] = 'Dear {$a->username},
+
+Your payment has been confirmed.
+
+Code: {$a->code}
+Item: {$a->concept}
+Amount: {$a->amount} {$a->currency}
+Date: {$a->date}
+
+You can now access your purchased content.
+
+Best regards,
+{$a->sitename}';
+$string['mail_confirm_pay_subject'] = 'Payment confirmed - {$a->code}';
+$string['mail_denied_pay'] = 'Dear {$a->username},
+
+Your payment request has been denied.
+
+Code: {$a->code}
+Item: {$a->concept}
+Amount: {$a->amount} {$a->currency}
+
+Please contact support for more information.
+
+Best regards,
+{$a->sitename}';
+$string['mail_denied_pay_subject'] = 'Payment denied - {$a->code}';
 $string['manage'] = 'Manage transfers';
 $string['managepayments'] = 'Manage transfers';
 $string['max_number_of_files'] = 'Maximum number of files';

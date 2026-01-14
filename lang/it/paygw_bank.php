@@ -38,12 +38,25 @@ $string['concept'] = 'Causale';
 $string['cost'] = 'Costo';
 $string['deny'] = 'Rifiuta';
 $string['email_notifications'] = 'Notifiche email';
-$string['email_notifications_confirm'] = 'Il pagamento con codice {$a->code} è stato approvato';
+$string['email_notifications_confirm'] = 'Un pagamento è stato approvato.
+
+Codice: {$a->code}
+Utente: {$a->userfullname}
+Email: {$a->useremail}
+Elemento: {$a->concept}
+Importo: {$a->amount} {$a->currency}
+Data: {$a->date}';
 $string['email_notifications_help'] = 'Un indirizzo email esterno può essere notificato quando viene accodato un nuovo pagamento o quando cambia lo stato';
 $string['email_notifications_new_attachments'] = 'Il pagamento con codice {$a->code} ha nuovi allegati';
-$string['email_notifications_new_request'] = 'È stata ricevuta una nuova richiesta di pagamento. Codice: {$a->code}';
+$string['email_notifications_new_request'] = 'È stata ricevuta una nuova richiesta di pagamento.
+
+Codice: {$a->code}
+Utente: {$a->userfullname}
+Email: {$a->useremail}
+Elemento: {$a->concept}
+Importo: {$a->amount} {$a->currency}';
 $string['email_notifications_subject_attachments'] = 'Un pagamento ha nuovi allegati';
-$string['email_notifications_subject_confirm'] = 'Un pagamento è stato approvato';
+$string['email_notifications_subject_confirm'] = 'Pagamento approvato - {$a->code}';
 $string['email_notifications_subject_new'] = 'Nuova richiesta di pagamento tramite bonifico';
 $string['email_to_notify'] = 'Indirizzo email per le notifiche';
 $string['file_already_uploaded'] = 'File già caricato';
@@ -53,10 +66,33 @@ $string['gatewayname'] = 'Bonifico bancario';
 $string['hasfiles'] = 'Ha file allegati';
 $string['instructionstext'] = 'Istruzioni mostrate prima di accettare il pagamento tramite bonifico';
 $string['internalerror'] = 'Si è verificato un errore interno. Contattaci.';
-$string['mail_confirm_pay'] = 'Gentile {$a->username}, il tuo pagamento per "{$a->concept}" è stato confermato. Codice: {$a->code}';
-$string['mail_confirm_pay_subject'] = 'Pagamento confermato';
-$string['mail_denied_pay'] = 'Gentile {$a->username}, il tuo pagamento per "{$a->concept}" è stato rifiutato. Codice: {$a->code}';
-$string['mail_denied_pay_subject'] = 'Pagamento rifiutato';
+$string['mail_confirm_pay'] = 'Gentile {$a->username},
+
+il tuo pagamento è stato confermato.
+
+Codice: {$a->code}
+Elemento: {$a->concept}
+Importo: {$a->amount} {$a->currency}
+Data: {$a->date}
+
+Puoi ora accedere al contenuto acquistato.
+
+Cordiali saluti,
+{$a->sitename}';
+$string['mail_confirm_pay_subject'] = 'Pagamento confermato - {$a->code}';
+$string['mail_denied_pay'] = 'Gentile {$a->username},
+
+la tua richiesta di pagamento è stata rifiutata.
+
+Codice: {$a->code}
+Elemento: {$a->concept}
+Importo: {$a->amount} {$a->currency}
+
+Contatta il supporto per maggiori informazioni.
+
+Cordiali saluti,
+{$a->sitename}';
+$string['mail_denied_pay_subject'] = 'Pagamento rifiutato - {$a->code}';
 $string['manage'] = 'Gestisci bonifici';
 $string['managepayments'] = 'Gestisci bonifici';
 $string['max_number_of_files'] = 'Numero massimo di file';

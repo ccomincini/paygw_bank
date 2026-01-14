@@ -114,6 +114,10 @@ class bank_helper {
             $contentmessage->username = $fullname;
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
+            $contentmessage->amount = format_float($record->totalamount, 2);
+            $contentmessage->currency = $record->currency;
+            $contentmessage->date = userdate(time());
+            $contentmessage->sitename = format_string(get_site()->fullname);
             $mailcontent = get_string('mail_confirm_pay', 'paygw_bank', $contentmessage);
             email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
             $USER->lang = $userlang;
@@ -124,9 +128,15 @@ class bank_helper {
         if ($sendemail) {
             $supportuser = core_user::get_support_user();
             $subject = get_string('email_notifications_subject_confirm', 'paygw_bank');
+            $paymentuser = self::get_user($record->userid);
             $contentmessage = new stdClass();
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
+            $contentmessage->amount = format_float($record->totalamount, 2);
+            $contentmessage->currency = $record->currency;
+            $contentmessage->date = userdate(time());
+            $contentmessage->userfullname = fullname($paymentuser, true);
+            $contentmessage->useremail = $paymentuser->email;
             $mailcontent = get_string('email_notifications_confirm', 'paygw_bank', $contentmessage);
             $emailuser = new stdClass();
             $emailuser->email = $emailaddress;
@@ -201,6 +211,9 @@ class bank_helper {
             $contentmessage->username = $fullname;
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
+            $contentmessage->amount = format_float($record->totalamount, 2);
+            $contentmessage->currency = $record->currency;
+            $contentmessage->sitename = format_string(get_site()->fullname);
             $mailcontent = get_string('mail_denied_pay', 'paygw_bank', $contentmessage);
             email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
             $USER->lang = $userlang;
@@ -225,6 +238,9 @@ class bank_helper {
             $contentmessage->username = $fullname;
             $contentmessage->code = $request->code;
             $contentmessage->concept = $request->description;
+            $contentmessage->amount = format_float($request->totalamount, 2);
+            $contentmessage->currency = $request->currency;
+            $contentmessage->sitename = format_string(get_site()->fullname);
             $mailcontent = get_string('mail_denied_pay', 'paygw_bank', $contentmessage);
             email_to_user($paymentuser, $supportuser, $subject, $mailcontent);
         }
@@ -313,10 +329,15 @@ class bank_helper {
 
         if ($sendemail) {
             $supportuser = core_user::get_support_user();
+            $user = self::get_user($userid);
             $subject = get_string('email_notifications_subject_new', 'paygw_bank');
             $contentmessage = new stdClass();
             $contentmessage->code = $record->code;
             $contentmessage->concept = $record->description;
+            $contentmessage->amount = format_float($record->totalamount, 2);
+            $contentmessage->currency = $record->currency;
+            $contentmessage->userfullname = fullname($user, true);
+            $contentmessage->useremail = $user->email;
             $mailcontent = get_string('email_notifications_new_request', 'paygw_bank', $contentmessage);
             $emailuser = new stdClass();
             $emailuser->email = $emailaddress;
